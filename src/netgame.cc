@@ -77,7 +77,7 @@ void handle_client_packet(ecl::Buffer &b, int player_no) {
             float dx, dy;
             if (b >> dx >> dy) {
                 printf("-- yei!\n");
-                server::Msg_MouseForce(ecl::V2(dx, dy));
+                server::Msg_MouseForce(ecl::V2(dx, dy), 0);
             }
             break;
         }

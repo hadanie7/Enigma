@@ -204,7 +204,7 @@ void Msg_Pause(bool onoff);
 
 void Msg_Panic(bool onoff);
 
-void Msg_MouseForce(const ecl::V2 &f);
+void Msg_MouseForce(const ecl::V2 &f, unsigned iplayer);
 
 void Msg_ActivateItem();
 

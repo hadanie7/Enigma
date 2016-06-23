@@ -72,8 +72,8 @@ Value Floor::message(const Message &m) {
     return GridObject::message(m);
 }
 
-ecl::V2 Floor::process_mouseforce(Actor *a, ecl::V2 force) {
-    if (a->controlled_by(player::CurrentPlayer()))
+ecl::V2 Floor::process_mouseforce(Actor *a, ecl::V2 force, int forcing_player) {
+    if (a->controlled_by(forcing_player))
         return getAdhesion() * force;
     else
         return ecl::V2();

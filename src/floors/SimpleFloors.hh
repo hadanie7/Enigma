@@ -168,7 +168,7 @@ namespace enigma {
         virtual std::string getModelName() const;
                 
         // Floor interface
-        virtual ecl::V2 process_mouseforce (Actor *a, ecl::V2 force);
+        virtual ecl::V2 process_mouseforce (Actor *a, ecl::V2 force, int forcing_player);
     };
 } // namespace enigma
 

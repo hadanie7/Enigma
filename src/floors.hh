@@ -86,7 +86,7 @@ public:
     virtual Value getAttr(const std::string &key) const override;
 
     // Floor interface
-    virtual ecl::V2 process_mouseforce(Actor *a, ecl::V2 force);
+    virtual ecl::V2 process_mouseforce(Actor *a, ecl::V2 force, int forcing_player);
     virtual void add_force(Actor *, ecl::V2 &);  // Note: actor = 0 must be allowed!
 
     virtual void on_drop(Item *) {}

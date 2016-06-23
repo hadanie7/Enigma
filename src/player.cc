@@ -37,6 +37,30 @@ using enigma::Inventory;
 
 namespace {
 
+/* -------------------- MouseForce -------------------- */
+
+/*! This class implements the "force field" that accelerates
+  objects when the mouse is moved.  Only objects that have the
+  "mouseforce" and the "controllers" attributes set are affected
+  by this force field. */
+class MouseForce {
+public:
+    void set_force(ecl::V2 f) { force = f; }
+    void add_force(ecl::V2 f) { force += f; }
+
+    ecl::V2 get_force(Actor *a) {
+        if (a->is_flying() || a->is_dead())
+            return ecl::V2();
+        else
+            return force * a->get_mouseforce();
+    }
+
+    void tick(double /*dtime*/) { force = ecl::V2(); }
+
+private:
+    ecl::V2 force;
+};
+
 class PlayerInfo {
 public:
     PlayerInfo();
@@ -47,6 +71,8 @@ public:
     bool out_of_lives;
     double dead_dtime;  // number of seconds the player is already dead
     bool inhibit_pickup;
+    
+    MouseForce m_mouseforce;
 };
 
 struct RespawnInfo {
@@ -250,6 +276,10 @@ void player::SetCurrentPlayer(unsigned iplayer) {
     }
 }
 
+unsigned player::NumberOfPlayers() {
+    return players.size();
+}
+
 unsigned player::NumberOfRealPlayers() {
     unsigned real_players = 0;
 
@@ -293,6 +323,20 @@ void player::Suicide() {
         for (auto &actor : player.actors) {
             SendMessage(actor, "_suicide");
         }
+    }
+}
+
+void player::SetMouseForce(ecl::V2 f, unsigned iplayer) {
+    players[iplayer].m_mouseforce.add_force(f);
+}
+
+ecl::V2 player::GetMouseForce(unsigned iplayer, Actor *a) {
+    return players[iplayer].m_mouseforce.get_force(a);
+}
+
+void player::tick_mouseforce(double dtime) {
+    for (auto &player : players) {
+        player.m_mouseforce.tick(dtime);
     }
 }
 

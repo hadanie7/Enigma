@@ -467,7 +467,7 @@ void World::tick(double dtime) {
         stone_change(stone);
     changed_stones.clear();
 
-    m_mouseforce.tick(dtime);
+    player::tick_mouseforce(dtime);
     for (auto &force : forces)
         force->tick(dtime);
 
@@ -556,36 +556,49 @@ ecl::V2 World::drunkenMouseforce(Actor *a, V2 &mforce) {
   only after a *successful* time step, so they cannot be used
   here.] */
 ecl::V2 World::get_local_force(Actor *a) {
-    ecl::V2 f;
-    ecl::V2 m;
+    ecl::V2 f; // floor force
+    ecl::V2 m; // mouse induced force
     double friction = 0;
 
     if (a->is_on_floor()) {
-        if (Floor *floor = a->m_actorinfo.field->floor) {
-            // Mouse force
-            if (a->get_controllers() != 0) {
-                m = floor->process_mouseforce(a, m_mouseforce.get_force(a));
-            }
-            // Friction
-            friction = floor->get_friction();
+        Item *item = a->m_actorinfo.field->item;
+        Floor *floor = a->m_actorinfo.field->floor;
 
-            // Floor force
+        // Mouse force
+        if (a->get_controllers() != 0) {
+            for (unsigned iplayer = 0; iplayer < player::NumberOfPlayers(); iplayer++) {
+                ecl::V2 raw_mouse_force = player::GetMouseForce(iplayer, a);
+                ecl::V2 m_player;
+                if (floor) {
+                    m_player = floor->process_mouseforce(a, raw_mouse_force, iplayer);
+                }
+                if (item) {
+                    m_player = item->calcMouseforce(a, raw_mouse_force, m_player);
+                }
+                m += m_player;
+            }
+        }
+        m = drunkenMouseforce(a, m);
+        
+        // Floor force
+        if (floor) {
             floor->add_force(a, f);
         }
-
-        if (Item *item = a->m_actorinfo.field->item) {
-            friction = item->getFriction(a->get_pos(), friction, a);
-            if (a->get_controllers() != 0) {
-                m = item->calcMouseforce(a, m_mouseforce.get_force(a), m);
-            }
+        if (item) {
             item->add_force(a, f);
+        }
+        
+        // Friction
+        if (floor) {
+            friction = floor->get_friction();
+        }
+        if (item) {
+            friction = item->getFriction(a->get_pos(), friction, a);
         }
     }
 
     a->m_actorinfo.friction = friction;
-    f += drunkenMouseforce(a, m);
-
-    return f;
+    return f+m;
 }
 
 /* Global forces are calculated less often than local ones, namely
@@ -1737,10 +1750,6 @@ bool WorldInitLevel() {
     }
 
     return true;
-}
-
-void SetMouseForce(V2 f) {
-    level->m_mouseforce.add_force(f);
 }
 
 void NameObject(Object *obj, const std::string &name) {

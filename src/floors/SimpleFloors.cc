@@ -165,8 +165,8 @@ namespace enigma {
                 objFlags & OBJBIT_INVISIBLE ? "_invisible" : "");
     }
     
-    ecl::V2 YinyangFloor::process_mouseforce (Actor *a, ecl::V2 force) {
-        if (player::CurrentPlayer() == state)
+    ecl::V2 YinyangFloor::process_mouseforce (Actor *a, ecl::V2 force, int forcing_player) {
+        if (forcing_player == state)
             return getAdhesion() * force;
         else
             return ecl::V2();

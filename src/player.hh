@@ -68,6 +68,7 @@ void RemoveRespawnPositions(Value color);
 
 int CurrentPlayer();
 void SetCurrentPlayer(unsigned iplayer);
+unsigned NumberOfPlayers();
 unsigned NumberOfRealPlayers();
 
 Inventory *MayPickup(Actor *a, Item *it, bool allowFlying = false);
@@ -76,6 +77,10 @@ Inventory *GetInventory(Actor *a);
 bool WieldedItemIs(Actor *a, const std::string &kind);
 
 void Suicide();
+
+void SetMouseForce(ecl::V2 f, unsigned iplayer);
+ecl::V2 GetMouseForce(unsigned iplayer, Actor *a);
+void tick_mouseforce(double dtime);
 
 void AddActor(unsigned iplayer, Actor *a);
 void AddUnassignedActor(Actor *a);  // actors not assigned to a player

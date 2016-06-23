@@ -37,30 +37,6 @@ typedef std::list<Rubberband *> RubberbandList;
 typedef std::vector<Actor *> ActorList;
 typedef std::vector<Signal> SignalList;
 
-/* -------------------- MouseForce -------------------- */
-
-/*! This class implements the "force field" that accelerates
-  objects when the mouse is moved.  Only objects that have the
-  "mouseforce" and the "controllers" attributes set are affected
-  by this force field. */
-class MouseForce {
-public:
-    void set_force(ecl::V2 f) { force = f; }
-    void add_force(ecl::V2 f) { force += f; }
-
-    ecl::V2 get_force(Actor *a) {
-        if (a->is_flying() || a->is_dead())
-            return ecl::V2();
-        else
-            return force * a->get_mouseforce();
-    }
-
-    void tick(double /*dtime*/) { force = ecl::V2(); }
-
-private:
-    ecl::V2 force;
-};
-
 /* -------------------- Scramble -------------------- */
 
 /*! Stores all positions plus direction where puzzle scrambling
@@ -332,7 +308,6 @@ public:
     Actor *rightmost_actor;
     OtherList others;
     RubberbandList rubberbands;
-    MouseForce m_mouseforce;
     ecl::V2 globalForce;
     int scrambleIntensity;
     int numMeditatists;

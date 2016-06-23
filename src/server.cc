@@ -587,8 +587,8 @@ void Msg_Panic(bool onoff) {
         state = sv_running;
 }
 
-void Msg_MouseForce(const ecl::V2 &f) {
-    SetMouseForce(f);
+void Msg_MouseForce(const ecl::V2 &f, unsigned iplayer) {
+    player::SetMouseForce(f, iplayer);
 }
 
 void SetCompatibility(const char *version) {
