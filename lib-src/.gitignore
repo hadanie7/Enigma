@@ -11,6 +11,7 @@ extractchunks
 extractchunks.exe
 install-sh
 libecl.a
+libmanymouse.a
 libenet.a
 liblua.a
 liboxyd.a

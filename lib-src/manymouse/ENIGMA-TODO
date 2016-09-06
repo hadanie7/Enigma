@@ -1,0 +1,13 @@
+The way I incorporated this library into the build system was by imitating the way it was done for enigma-core.
+It compiles for me (on debian), however, I suspect that this is not completely portable. Specifically, I think that the following lines from the original makefile of manymouse should have an equivalent in the enigma build system:
+
+ifeq ($(strip $(macosx)),true)
+  LDFLAGS += -framework Carbon -framework IOKit
+endif
+
+ifeq ($(strip $(linux)),true)
+  CFLAGS += -fPIC -I/usr/src/linux/include
+  LDFLAGS += -ldl
+endif
+
+but I don't know enough in order to do it.

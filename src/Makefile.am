@@ -15,7 +15,8 @@ CXXFLAGS = @CXXFLAGS@\
 	-I$(top_srcdir)/lib-src/zipios++  \
 	-I$(top_builddir)/lib-src/zipios++ \
 	-I$(top_srcdir)/lib-src/lua \
-	-I$(top_srcdir)/lib-src/enigma-core
+	-I$(top_srcdir)/lib-src/enigma-core \
+	-I$(top_srcdir)/lib-src/manymouse
 
 if SYSTEM_ENET
 CXXFLAGS += $(LIBENET_CFLAGS)
@@ -449,7 +450,8 @@ endif
 enigma_LDADD = \
 	@LIBINTL@ \
 	$(top_builddir)/lib-src/enigma-core/libecl.a \
-	$(top_builddir)/lib-src/lua/liblua.a
+	$(top_builddir)/lib-src/lua/liblua.a \
+	$(top_builddir)/lib-src/manymouse/libmanymouse.a
 
 if SYSTEM_ENET
 enigma_LDADD += $(LIBENET_LIBS)

@@ -510,6 +510,7 @@ AC_CONFIG_FILES([Makefile m4/Makefile  intl/Makefile
            lib-src/Makefile
 	   lib-src/oxydlib/Makefile
 	   lib-src/lua/Makefile
+	   lib-src/manymouse/Makefile
            lib-src/enigma-core/Makefile
 	   src/Makefile
 	   tools/Makefile

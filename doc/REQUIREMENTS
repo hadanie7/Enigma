@@ -52,6 +52,8 @@ curl		7.20.0 (earlier versions should work, too)
 
 xdg-utils	(L) only on runtime
 
+libxi-dev (L)
+
 Tools:
 ------
 
