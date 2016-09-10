@@ -869,9 +869,9 @@ void Client::level_loaded(bool isRestart) {
     m_effect.reset(video::MakeEffect((isRestart ? video::TM_SQUARES : video::TM_PUSH_RANDOM),
                                      video::BackBuffer()));
 
-    update_player_mode();
-
     m_cheater = false;
+
+    update_player_mode();
 
     m_state = cls_preparing_game;
 }
