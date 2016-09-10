@@ -138,6 +138,9 @@ void stop() {
 bool poll_event(Event *ret) {
     if ( !is_running ) return false;
 
+	ret->x = 0;
+	ret->y = 0;
+	ret->player = -1;
     ManyMouseEvent event;
     while ( ManyMouse_PollEvent(&event) ) {
         if (event.device >= (unsigned int) available_mice) continue;

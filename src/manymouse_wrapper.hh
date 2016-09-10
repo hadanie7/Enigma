@@ -20,15 +20,14 @@ namespace manymouse {
     enum EventType {
         EVENT_MOTION,
         EVENT_BUTTON,
-        EVENT_SCROLL,
-        EVENT_NONE
+        EVENT_SCROLL
     };
 
     struct Event {
-        EventType type = EVENT_NONE;
-        int player = -1;
-        int x = 0;
-        int y = 0;
+        EventType type;
+        int player;
+        int x;
+        int y;
     };
 
     // these methods should be safe to use even when manymouse is off, and do nothing if not applicable.
