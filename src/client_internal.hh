@@ -121,13 +121,14 @@ public:
 
     void error(const std::string &text);
 
-    void abort() { m_state = cls_abort; }
+    void abort();
     bool abort_p() const { return m_state == cls_abort; }
 
     void mark_cheater() { m_cheater = true; }
     void easy_going() { m_hunt_against_time = false; }
     void registerDocument(std::string text);
     void finishedText();
+    void update_player_mode();
 
 private:
     std::string init_hunted_time();

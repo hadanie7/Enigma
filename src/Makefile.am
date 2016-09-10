@@ -84,6 +84,8 @@ enigma_SOURCES = 		\
 	lua-ecl.cc 		\
 	lua-ecl.hh		\
 	main.cc 		\
+	manymouse_wrapper.cc \
+	manymouse_wrapper.hh \
 	main.hh			\
 	MessageDescriptor.cc	\
 	MessageDescriptor.hh	\

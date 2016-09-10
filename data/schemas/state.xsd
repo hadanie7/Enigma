@@ -14,7 +14,7 @@
           <xs:annotation>
             <xs:documentation>
               All simple key-value-properties:
-              UserName, CurrentGroup, NextLevelMode, Difficulty
+              UserName, CurrentGroup, NextLevelMode, Difficulty, PlayerMode
             </xs:documentation>
           </xs:annotation>
           <xs:complexType>

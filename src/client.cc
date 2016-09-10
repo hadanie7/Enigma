@@ -51,6 +51,8 @@
 
 #include "client_internal.hh"
 
+#include "manymouse_wrapper.hh"
+
 namespace enigma {
 namespace client {
 
@@ -190,6 +192,22 @@ void Client::network_stop() {
         enet_peer_reset(m_server);
 }
 
+void Client::abort() {
+    m_state = cls_abort;
+    manymouse::stop();
+}
+
+void Client::update_player_mode() {
+    int playermode = app.state->getInt("PlayerMode");
+    if (playermode == LOCAL_TWO_PLAYERS) mark_cheater(); // not really a cheat, but we don't want to count it together with the normal scores.
+
+    if ( playermode == LOCAL_TWO_PLAYERS && server::TwoPlayerGame ) {
+        manymouse::init(player::NumberOfPlayers());
+    } else {
+        manymouse::stop();
+    }
+}
+
 /* ---------- Event handling ---------- */
 
 void Client::handle_events() {
@@ -198,6 +216,7 @@ void Client::handle_events() {
         switch (e.type) {
         case SDL_KEYDOWN: on_keydown(e); break;
         case SDL_MOUSEMOTION:
+            if ( manymouse::is_on() ) break;
             if (abs(e.motion.xrel) > 300 || abs(e.motion.yrel) > 300) {
                 fprintf(stderr, "mouse event with %i, %i\n", e.motion.xrel, e.motion.yrel);
             } else {
@@ -206,7 +225,9 @@ void Client::handle_events() {
             }
             break;
         case SDL_MOUSEBUTTONDOWN:
-        case SDL_MOUSEBUTTONUP: on_mousebutton(e); break;
+        case SDL_MOUSEBUTTONUP:
+            if ( manymouse::is_on() ) break;
+            on_mousebutton(e); break;
         case SDL_ACTIVEEVENT: {
             update_mouse_button_state();
             if (e.active.gain == 0 && !video::IsFullScreen())
@@ -222,6 +243,21 @@ void Client::handle_events() {
         case SDL_QUIT:
             client::Msg_Command("abort");
             app.bossKeyPressed = true;
+            break;
+        }
+    }
+
+    manymouse::Event me;
+    while (manymouse::poll_event(&me)) {
+        int iplayer = (app.state->getInt("PlayerMode") == LOCAL_TWO_PLAYERS) ? me.player : player::CurrentPlayer();
+        switch (me.type) {
+        case manymouse::EVENT_MOTION:
+            if (abs(me.x) > 300 || abs(me.y) > 300) {
+                fprintf(stderr, "mouse event with %i, %i\n", me.x, me.y);
+            } else {
+                server::Msg_MouseForce(options::GetDouble("MouseSpeed") *
+                        ecl::V2(me.x, me.y), iplayer);
+            }
             break;
         }
     }
@@ -406,6 +442,7 @@ void Client::on_keydown(SDL_Event &e) {
             video::TempInputGrab(false);
             video::ToggleFullscreen();
             sdl::FlushEvents();
+            manymouse::flush_events();
         } break;
         default: break;
         };
@@ -535,6 +572,8 @@ void Client::show_menu(bool isESC) {
         enigma::gui::GameMenu(x, y).manage();
     }
     video::HideMouse();
+
+    manymouse::flush_events();
     update_mouse_button_state();
     if (m_state == cls_game)
         display::RedrawAll(screen);
@@ -626,6 +665,7 @@ void Client::tick(double dtime) {
             m_timeaccu = 0;
             m_total_game_time = 0;
             sdl::FlushEvents();
+            manymouse::flush_events();
         }
         break;
     }
@@ -828,7 +868,11 @@ void Client::level_loaded(bool isRestart) {
 
     m_effect.reset(video::MakeEffect((isRestart ? video::TM_SQUARES : video::TM_PUSH_RANDOM),
                                      video::BackBuffer()));
+
+    update_player_mode();
+
     m_cheater = false;
+
     m_state = cls_preparing_game;
 }
 
@@ -913,6 +957,8 @@ void Msg_Command(const std::string &cmd) {
         client_instance.mark_cheater();
     } else if (cmd == "easy_going") {
         client_instance.easy_going();
+    } else if (cmd == "update_player_mode") {
+        client_instance.update_player_mode();
     } else {
         enigma::Log << "Warning: Client received unknown command '" << cmd << "'\n";
     }

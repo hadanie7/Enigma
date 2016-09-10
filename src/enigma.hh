@@ -39,6 +39,8 @@ enum Color { BLACK = 0, WHITE = 1, BLUE = 2, YELLOW = 3 };
 
 enum Difficulty { DIFFICULTY_EASY = 1, DIFFICULTY_HARD = 2, DIFFICULTY_ANY = 3 };
 
+enum PlayerMode { SINGLE_PLAYER = 0, LOCAL_TWO_PLAYERS = 1 };
+
 // Enigma can run its own levels but also emulate various versions of Oxyd.
 // All these games behave similarly, but there are a few differences in object
 // behaviour, visual appearance, etc.

@@ -553,6 +553,20 @@ void Msg_Command(const string &cmd) {
                           curProxy->getId() + "\")";
 
         client::Msg_ShowText(infotext, true);
+    } else if (cmd == "twomice") {
+        if (app.state->getInt("PlayerMode") != LOCAL_TWO_PLAYERS) {
+            client::Msg_ShowText("Changing to two players mode. Games will not count for score.", false, 2);
+            app.state->setProperty("PlayerMode", LOCAL_TWO_PLAYERS);
+            client::Msg_Command("update_player_mode");
+        } else
+            client::Msg_ShowText("Already in two players mode.", false, 2);
+    } else if (cmd == "onemouse") {
+        if (app.state->getInt("PlayerMode") != SINGLE_PLAYER) {
+            client::Msg_ShowText("Changing to single player mode.", false, 2);
+            app.state->setProperty("PlayerMode", SINGLE_PLAYER);
+            client::Msg_Command("update_player_mode");
+        } else
+            client::Msg_ShowText("Already in single player mode.", false, 2);
     } else if (cmd.substr(0, 5) == "find ") {  // global level-jump
         string args = cmd.substr(5);
         Msg_Command_find(args);
