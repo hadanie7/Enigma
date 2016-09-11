@@ -36,9 +36,9 @@ bool is_running = false;
 bool XInput2_hacks = false;
 
 struct Mouse {
-    int connected = 1;
-    int buttons = 0;
-    int player = -1;
+    int connected;
+    int buttons;
+    int player;
 };
 
 Mouse mice[MAX_MICE];
@@ -138,9 +138,9 @@ void stop() {
 bool poll_event(Event *ret) {
     if ( !is_running ) return false;
 
-	ret->x = 0;
-	ret->y = 0;
-	ret->player = -1;
+    ret->x = 0;
+    ret->y = 0;
+    ret->player = -1;
     ManyMouseEvent event;
     while ( ManyMouse_PollEvent(&event) ) {
         if (event.device >= (unsigned int) available_mice) continue;
@@ -171,30 +171,23 @@ bool poll_event(Event *ret) {
                 else if (event.item == 1)
                     ret->y = event.value;
             } else if (event.type == MANYMOUSE_EVENT_BUTTON) {
-                // handle that later
-                /*if (event.item < 32)
-                {
-                    if (event.value)
+                if (event.item < 32) {
+                    ret->button = event.item;
+                    if (event.value) {
+                        ret->type = EVENT_BUTTON_PRESS;
                         mouse->buttons |= (1 << event.item);
-                    else
+                    } else {
+                        ret->type = EVENT_BUTTON_RELEASE;
                         mouse->buttons &= ~(1 << event.item);
-                }*/
-            } else if (event.type == MANYMOUSE_EVENT_SCROLL) {
-                // handle that later
-                /*if (event.item == 0)
-                {
-                    if (event.value < 0)
-                        mouse->scrolldowntick = SDL_GetTicks();
-                    else
-                        mouse->scrolluptick = SDL_GetTicks();
+                    }
                 }
-                else if (event.item == 1)
-                {
-                    if (event.value < 0)
-                        mouse->scrolllefttick = SDL_GetTicks();
-                    else
-                        mouse->scrollrighttick = SDL_GetTicks();
-                }*/
+            } else if (event.type == MANYMOUSE_EVENT_SCROLL) {
+                ret->type = EVENT_SCROLL;
+                if (event.item == 0)  { // scroll up/down
+                    ret->y = event.value;
+                } else if (event.item == 1) { // scroll left/right
+                    ret->x = event.value;
+                }
             }
             return true;
         } // end of useful events
@@ -217,7 +210,7 @@ void flush_events() {
     while ( poll_event(&event) ) {};
 }
 
-int get_player_buttons(int iplayer) { // not ready yet
+int get_player_buttons(int iplayer) {
     if ( !is_running ) return 0;
     int imouse = player_mapping[iplayer];
     return imouse == -1 ? 0 : mice[imouse].buttons;

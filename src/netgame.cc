@@ -77,13 +77,13 @@ void handle_client_packet(ecl::Buffer &b, int player_no) {
             float dx, dy;
             if (b >> dx >> dy) {
                 printf("-- yei!\n");
-                server::Msg_MouseForce(ecl::V2(dx, dy), 0);
+                server::Msg_MouseForce(ecl::V2(dx, dy), 0 /*this was added to the function's signature later, to support a local two player game. I just put a 0 to silence the compile error it should be fixed later*/);
             }
             break;
         }
 
         case server::SVMSG_ACTIVATEITEM: {
-            server::Msg_ActivateItem();
+            server::Msg_ActivateItem(0 /*this was added to the function's signature later, to support a local two player game. I just put a 0 to silence the compile error, it should be fixed later*/);
             break;
         }
 

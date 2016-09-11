@@ -259,35 +259,53 @@ void Client::handle_events() {
                         ecl::V2(me.x, me.y), iplayer);
             }
             break;
+        case manymouse::EVENT_BUTTON_PRESS:
+            if ( me.button == 0 ) server::Msg_ActivateItem(iplayer);
+            else if  ( me.button == 1 ) rotate_inventory(+1, iplayer);
+        case manymouse::EVENT_BUTTON_RELEASE: // fall through
+            update_mouse_button_state();
+            break;
+        case manymouse::EVENT_SCROLL:
+            rotate_inventory( (me.y - me.x) > 0 ? (+1) : (-1), iplayer);
+            break;
         }
     }
 }
 
 void Client::update_mouse_button_state() {
-    int b = SDL_GetMouseState(0, 0);
-    player::InhibitPickup((b & SDL_BUTTON(1)) || (b & SDL_BUTTON(3)));
+    if ( !manymouse::is_on() ) {
+        int b = SDL_GetMouseState(0, 0);
+        player::InhibitPickup((b & SDL_BUTTON(1)) || (b & SDL_BUTTON(3)), player::CurrentPlayer());
+    } else {
+        for (int iplayer = 0; iplayer < player::NumberOfPlayers(); iplayer++) {
+            int b = manymouse::get_player_buttons(iplayer);
+            player::InhibitPickup((b & (1<<0)) || (b & (1<<1)), iplayer);
+        }
+    }
 }
 
 void Client::on_mousebutton(SDL_Event &e) {
     if (e.button.state == SDL_PRESSED) {
         if (e.button.button == 1) {
             // left mousebutton -> activate first item in inventory
-            server::Msg_ActivateItem();
+            server::Msg_ActivateItem(player::CurrentPlayer());
         } else if (e.button.button == 3 || e.button.button == 4) {
             // right mousebutton, wheel down -> rotate inventory
-            rotate_inventory(+1);
+            rotate_inventory(+1, player::CurrentPlayer());
         } else if (e.button.button == 5) {
             // wheel down -> inverse rotate inventory
-            rotate_inventory(-1);
+            rotate_inventory(-1, player::CurrentPlayer());
         }
     }
     update_mouse_button_state();
 }
 
-void Client::rotate_inventory(int direction) {
-    m_user_input = "";
-    display::GetStatusBar()->hide_text();
-    player::RotateInventory(direction);
+void Client::rotate_inventory(int direction, unsigned iplayer) {
+    if (iplayer == player::CurrentPlayer()) {
+        m_user_input = "";
+        display::GetStatusBar()->hide_text();
+    }
+    player::RotateInventory(direction, iplayer);
 }
 
 /* -------------------- Console related -------------------- */
@@ -466,7 +484,7 @@ void Client::on_keydown(SDL_Event &e) {
             break;
         case SDLK_LEFT: set_mousespeed(options::GetMouseSpeed() - 1); break;
         case SDLK_RIGHT: set_mousespeed(options::GetMouseSpeed() + 1); break;
-        case SDLK_TAB: rotate_inventory(+1); break;
+        case SDLK_TAB: rotate_inventory(+1, player::CurrentPlayer()); break;
         case SDLK_F1: show_help(); break;
         case SDLK_F2:
             // display hint

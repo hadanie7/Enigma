@@ -19,7 +19,8 @@
 namespace manymouse {
     enum EventType {
         EVENT_MOTION,
-        EVENT_BUTTON,
+        EVENT_BUTTON_PRESS,
+        EVENT_BUTTON_RELEASE,
         EVENT_SCROLL
     };
 
@@ -28,6 +29,7 @@ namespace manymouse {
         int player;
         int x;
         int y;
+        int button;
     };
 
     // these methods should be safe to use even when manymouse is off, and do nothing if not applicable.

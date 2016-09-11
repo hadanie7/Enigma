@@ -90,12 +90,12 @@ Actor *GetMainActor(unsigned iplayer);
 
 bool AllActorsDead();
 
-void InhibitPickup(bool yesno);
+void InhibitPickup(bool yesno, unsigned iplayer);
 void PickupItem(Actor *a, enigma::GridPos p);
 bool PickupAsItem(Actor *a, GridObject *obj, std::string kind);
-void RotateInventory(int dir = 1);
+void RotateInventory(int dir, unsigned iplayer);
 
-void ActivateFirstItem();
+void ActivateFirstItem(unsigned iplayer);
 ItemAction ActivateItem(Item *it);
 
 void Tick(double dtime);

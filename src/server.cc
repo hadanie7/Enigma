@@ -482,7 +482,7 @@ void Msg_Command(const string &cmd) {
 
     // ------------------------------ normal commands
     if (cmd == "invrotate") {
-        player::RotateInventory();
+        player::RotateInventory(+1, player::CurrentPlayer());
     } else if (cmd == "suicide") {
         player::Suicide();
         if (!AllowSuicide)
@@ -653,8 +653,8 @@ int GetMoveCounter() {
     return move_counter;
 }
 
-void Msg_ActivateItem() {
-    player::ActivateFirstItem();
+void Msg_ActivateItem(unsigned iplayer) {
+    player::ActivateFirstItem(iplayer);
 }
 
 }  // namespace server

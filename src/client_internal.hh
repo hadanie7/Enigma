@@ -148,7 +148,7 @@ private:
     void update_mouse_button_state();
 
     // Inventory & command line
-    void rotate_inventory(int direction);
+    void rotate_inventory(int direction, unsigned iplayer);
 
     void process_userinput();
     void user_input_append(char c);

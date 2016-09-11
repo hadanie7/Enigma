@@ -206,7 +206,7 @@ void Msg_Panic(bool onoff);
 
 void Msg_MouseForce(const ecl::V2 &f, unsigned iplayer);
 
-void Msg_ActivateItem();
+void Msg_ActivateItem(unsigned iplayer);
 
 }  // namespace server
 }  // namespace enigma

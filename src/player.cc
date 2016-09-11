@@ -536,8 +536,8 @@ void player::Tick(double dtime) {
     CheckDeadActors();
 }
 
-void player::InhibitPickup(bool flag) {
-    players[icurrent_player].inhibit_pickup = flag;
+void player::InhibitPickup(bool flag, unsigned iplayer) {
+    players[iplayer].inhibit_pickup = flag;
 }
 
 /*! Return pointer to inventory if actor may pick up items, 0
@@ -584,8 +584,8 @@ bool player::PickupAsItem(Actor *a, GridObject *obj, std::string kind) {
     return false;
 }
 
-void player::ActivateFirstItem() {
-    Inventory &inv = players[icurrent_player].inventory;
+void player::ActivateFirstItem(unsigned iplayer) {
+    Inventory &inv = players[iplayer].inventory;
 
     if (inv.size() > 0) {
         Item *it = inv.get_item(0);
@@ -593,8 +593,8 @@ void player::ActivateFirstItem() {
         GridPos p;
         bool can_drop_item = false;
         std::vector<Actor *>::iterator itr;
-        for (itr = players[icurrent_player].actors.begin();
-             itr != players[icurrent_player].actors.end() && ac == nullptr; itr++) {
+        for (itr = players[iplayer].actors.begin();
+            itr != players[iplayer].actors.end() && ac == nullptr; itr++) {
             if (!(*itr)->is_dead()) {
                 ac = *itr;
                 p = GridPos(ac->get_pos());
@@ -622,9 +622,9 @@ void player::ActivateFirstItem() {
     }
 }
 
-void player::RotateInventory(int dir) {
+void player::RotateInventory(int dir, unsigned iplayer) {
     sound::EmitSoundEvent("invrotate", ecl::V2());
-    Inventory &inv = players[icurrent_player].inventory;
+    Inventory &inv = players[iplayer].inventory;
     if (dir == 1)
         inv.rotate_left();
     else
