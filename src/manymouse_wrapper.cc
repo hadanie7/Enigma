@@ -198,15 +198,6 @@ bool poll_event(Event *ret) {
 void flush_events() {
     if ( !is_running ) return;
     Event event;
-
-    if (XInput2_hacks) {
-        // no idea why this is needed. if I don't do this then somtimes some of the events are "trapped" and
-        // only released later when we don't want them.
-        while ( poll_event(&event) ) {};
-        SDL_ShowCursor(SDL_ENABLE);
-        SDL_ShowCursor(SDL_DISABLE);
-        // Note: "SDL_Delay(0);" works here just as well (but i'm afraid that it may acctualy cause a very small delay).
-    }
     while ( poll_event(&event) ) {};
 }
 

@@ -122,6 +122,7 @@ static void (*pXFreeEventData)(Display*,XGenericEventCookie*) = 0;
 static int (*pXNextEvent)(Display*,XEvent*) = 0;
 static int (*pXPending)(Display*) = 0;
 static int (*pXFlush)(Display*) = 0;
+static void (*pXSync)(Display*,int) = 0;
 static int (*pXEventsQueued)(Display*,int) = 0;
 
 static int symlookup(void *dll, void **addr, const char *sym)
@@ -150,6 +151,7 @@ static int find_api_symbols(void)
     LOOKUP(XNextEvent);
     LOOKUP(XPending);
     LOOKUP(XFlush);
+    LOOKUP(XSync);
     LOOKUP(XEventsQueued);
 
     dll = libxext = dlopen("libXext.so.6", RTLD_GLOBAL | RTLD_LAZY);
@@ -356,6 +358,7 @@ static int get_next_x11_event(XEvent *xev)
     int available = 0;
 
     pXFlush(display);
+    pXSync(display, 0);
     if (pXEventsQueued(display, QueuedAlready))
         available = 1;
     else
