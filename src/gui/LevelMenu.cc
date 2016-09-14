@@ -45,6 +45,7 @@ namespace enigma { namespace gui {
     : but_advancemode (new AdvanceModeButton),
       but_next       (new ImageButton("ic-next", "ic-next1", this)),
       but_back       (new StaticTextButton(N_("Main Menu"), this)),
+      but_playermode (new PlayerModeButton),
       but_difficulty (new DifficultyButton),
       but_levelpack  (new StaticTextButton(N_("Level Pack"), this)),
       lbl_lpinfo     (new Label("")),
@@ -63,31 +64,31 @@ namespace enigma { namespace gui {
                 2, 5, 10, 14,
                 5, 5, 5, 5,
                 10, 5, 25, 10, 5, 45,
-                45, 70, 5, 17, 7
+                32, 70, 5, 17, 7
             },
             {  // VTS_32 (640x480)
                 5, 10, 20, 28,
                 10, 10, 10, 10,
                 20, 10, 50, 20, 10, 90,
-                90, 140, 10, 35, 15
+                65, 140, 10, 35, 15
             },
             {  // VTS_40 (800x600)
                 5, 10, 20, 28,
                 10, 10, 10, 10,                
                 20, 10, 50, 20, 10, 120,
-                90, 140, 10, 35, 15
+                65, 140, 10, 35, 15
             },
             {  // VTS_48 (960x720)  VM_1024x768
                 5, 10, 20, 28,
                 10, 10, 10, 10,                
                 20, 10, 50, 20, 10, 120,
-                90, 140, 10, 35, 15
+                65, 140, 10, 35, 15
             },
             {  // VTS_64 (1280x960)
                 15, 15, 25, 28,
                 15, 25, 15, 15,
                 20, 15, 50, 40, 10, 120,                
-                90, 140, 10, 35, 15
+                65, 140, 10, 35, 15
             }
         };
 
@@ -102,15 +103,18 @@ namespace enigma { namespace gui {
         
         HList *hl, *hll, *hlr ;
     
+        but_playermode->set_listener (this);
         but_difficulty->set_listener (this);
     
         // Create buttons
+        // TODO: reorganize the bottom row of buttons so that the image of the difficulty button is not cropped.
         hll = new HList;
         hll->set_spacing (param[vtt].hgap_button);
         hll->set_alignment (HALIGN_CENTER, VALIGN_TOP);
         hll->set_default_size (param[vtt].hsize_button_small, param[vtt].vsize_button);
         hll->add_back (but_advancemode);
         hll->add_back (but_next);
+        hll->add_back (but_playermode);
         hll->add_back (but_difficulty);
         
         hlr = new HList;
@@ -293,6 +297,9 @@ namespace enigma { namespace gui {
             Menu::quit();
         } else if (w == but_difficulty) {
             but_difficulty->on_action(w);
+            invalidate_all();
+        } else if (w == but_playermode) {
+            but_playermode->on_action(w);
             invalidate_all();
         }
     }
@@ -483,6 +490,31 @@ namespace enigma { namespace gui {
         ImageButton::draw(gc, r);
     }
     
+    /* -------------------- PlayerModeButton -------------------- */
+
+    PlayerModeButton::PlayerModeButton() : ImageButton("ic-oneplayer","ic-twoplayers",this) {
+        update();
+    }
+
+    void PlayerModeButton::update() {
+        if (app.state->getInt("PlayerMode") == SINGLE_PLAYER)
+            ImageButton::set_images("ic-oneplayer","ic-twoplayers");
+        else
+            ImageButton::set_images("ic-twoplayers","ic-oneplayer");
+    }
+
+    void PlayerModeButton::on_action(Widget *)
+    {
+        int newmode = (SINGLE_PLAYER+LOCAL_TWO_PLAYERS) - app.state->getInt("PlayerMode");
+        app.state->setProperty("PlayerMode", newmode);        update();
+        invalidate();
+    }
+
+    void PlayerModeButton::draw(ecl::GC &gc, const ecl::Rect &r) {
+        update();
+        ImageButton::draw(gc, r);
+    }
+
     /* -------------------- AdvanceModeButton -------------------- */
     
     AdvanceModeButton::AdvanceModeButton() : ImageButton("","",this) {

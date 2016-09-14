@@ -61,6 +61,7 @@ namespace enigma { namespace gui {
         Widget      *but_advancemode;   // Next unsolved level button
         Widget      *but_next;
         Widget      *but_back;          // "Back" button
+        Widget      *but_playermode;    // "PlayerMode" button
         Widget      *but_difficulty;    // "Difficulty" button
         TextButton  *but_levelpack;     // "Levelpack" button
         HList       *hl_info_stat;
@@ -81,6 +82,16 @@ namespace enigma { namespace gui {
         void on_action(Widget *);
     public:
         DifficultyButton();
+        virtual void draw(ecl::GC &gc, const ecl::Rect &r);
+    private:
+        void update();
+    };
+
+    class PlayerModeButton : public ImageButton {
+        // ActionListener interface.
+        void on_action(Widget *);
+    public:
+        PlayerModeButton();
         virtual void draw(ecl::GC &gc, const ecl::Rect &r);
     private:
         void update();
