@@ -304,12 +304,20 @@ public:
     void ShowMouse() override;
     int Mousex() override { return cursor->get_x(); }
     int Mousey() override { return cursor->get_y(); }
-
+/* replaced by code right after that
     bool GetInputGrab() override { return SDL_GetWindowGrab(window) == SDL_TRUE; }
 
     bool SetInputGrab(bool enabled) override {
         bool old_state = GetInputGrab();
         SDL_SetWindowGrab(window, enabled ? SDL_TRUE : SDL_FALSE);
+        return old_state;
+    }
+*/
+    bool GetInputGrab() override { return SDL_GetRelativeMouseMode() == SDL_TRUE; }
+
+    bool SetInputGrab(bool enabled) override {
+        bool old_state = GetInputGrab();
+        SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
         return old_state;
     }
 
