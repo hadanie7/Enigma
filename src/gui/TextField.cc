@@ -53,6 +53,13 @@ void TextField::activate() {
     Button::activate();
     if (get_parent())
         get_parent()->set_key_focus(this);
+
+    SDL_StartTextInput(); // text input should be on when active
+}
+
+void TextField::deactivate() {
+    Button::deactivate();
+    SDL_StopTextInput(); // text input should be off when inactive
 }
 
 void TextField::set_text(const std::string &t) {
@@ -126,6 +133,8 @@ void TextField::draw(ecl::GC &gc, const ecl::Rect &r) {
 bool TextField::on_event(const SDL_Event &e) {
     bool handeled = false;
     bool modified = false;
+
+    const char* last,*cur;
     
     switch (e.type) {
         case SDL_MOUSEBUTTONDOWN:
@@ -276,6 +285,16 @@ bool TextField::on_event(const SDL_Event &e) {
                     #endif
                     break;
             }
+            break;
+        case SDL_TEXTINPUT:
+            textPreCursor += e.text.text;
+            last = e.text.text; cur = last+1;
+            for(;*cur; cur++) // iterate over utf-8 bytes
+                if(*cur & 0b11000000 != 0b10000000){
+                    charSizesPreCursor.push_back(cur-last);
+                    last = cur;
+                }
+            charSizesPreCursor.push_back(cur-last);
             break;
         default:
             break;

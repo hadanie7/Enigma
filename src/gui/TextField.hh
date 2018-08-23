@@ -64,6 +64,7 @@ namespace enigma { namespace gui {
         
         // Widget interface.
         virtual void activate();
+        virtual void deactivate();
         virtual void tick (double dtime);
         virtual bool on_event(const SDL_Event &/*e*/);
         void draw(ecl::GC &gc, const ecl::Rect &r);
