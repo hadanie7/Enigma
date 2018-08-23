@@ -732,6 +732,12 @@ bool PushButton::on_event(const SDL_Event &e) {
             m_pressedp = false;
             handeled = true;
             break;
+        case SDL_MOUSEWHEEL:
+            lastUpSym = SDLK_UNKNOWN;
+            lastUpBotton = (e.wheel.y * (e.wheel.direction == SDL_MOUSEWHEEL_NORMAL ? 1 : -1))>0 ? 5 : 4;
+            handeled = true;
+            was_pressed = !was_pressed; // hack to invoke listener
+            break;
     }
 
     bool changed = (was_pressed != m_pressedp);

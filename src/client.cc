@@ -207,6 +207,7 @@ void Client::handle_events() {
             break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP: on_mousebutton(e); break;
+        case SDL_MOUSEWHEEL: on_mousewheel(e); break;
         case SDL_WINDOWEVENT: {
             update_mouse_button_state();
             if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
@@ -231,7 +232,17 @@ void Client::update_mouse_button_state() {
     int b = SDL_GetMouseState(0, 0);
     player::InhibitPickup((b & SDL_BUTTON(1)) || (b & SDL_BUTTON(3)));
 }
+void Client::on_mousewheel(SDL_Event &e) {
+    int dir = e.wheel.direction == SDL_MOUSEWHEEL_NORMAL ? 1 : -1;
+    int num = e.wheel.y; //ignore x direction scrolling
 
+    if(num < 0){ //invert direction on negative numbers
+        num *= -1;
+        dir *= -1;
+    }
+
+    for(int i = 0; i<num; i++) player::RotateInventory(dir);
+}
 void Client::on_mousebutton(SDL_Event &e) {
     if (e.button.state == SDL_PRESSED) {
         if (e.button.button == 1) {

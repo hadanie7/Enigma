@@ -405,6 +405,9 @@ namespace enigma { namespace gui {
                 if (get_area().contains(e.button.x, e.button.y))
                     handled = handle_mousedown (&e);
                 break;
+            case SDL_MOUSEWHEEL:
+                handled = handle_mousewheel (&e);
+                break;
             case SDL_KEYDOWN:
                 handled = handle_keydown (&e);
                 break;
@@ -412,6 +415,17 @@ namespace enigma { namespace gui {
         syncToIndexMgr();
         return handled;
     }
+
+    bool LevelWidget::handle_mousewheel(const SDL_Event *e) {
+
+        int num = e->wheel.y * (e->wheel.direction == SDL_MOUSEWHEEL_NORMAL ? 1 : -1); //invert if neccesary
+
+        if(num > 0) scroll_up(num);
+        else if(num < 0) scroll_down(-num);
+
+        return true;
+    }
+
     
     bool LevelWidget::handle_mousedown(const SDL_Event *e) {
         switch (e->button.button) {

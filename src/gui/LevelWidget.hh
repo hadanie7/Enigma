@@ -72,6 +72,7 @@ namespace enigma { namespace gui {
 
         bool handle_keydown (const SDL_Event *e);
         bool handle_mousedown (const SDL_Event *e);
+        bool handle_mousewheel (const SDL_Event *e);
 
         //---------- Variables ----------//
         bool    displayScoreIcons;
