@@ -335,16 +335,28 @@ ecl::Screen *ecl::Screen::get_instance() {
 
 ecl::Screen::Screen(SDL_Window *window)
 : m_window(window),
-  m_surface(Surface::make_surface(SDL_GetWindowSurface(window))),
-  m_sdlsurface(SDL_GetWindowSurface(window)),
+  m_renderer(SDL_CreateRenderer(m_window, -1, 0)),
+  m_surface(MakeSurface(SDL_GetWindowSurface(m_window)->w, SDL_GetWindowSurface(m_window)->h)),
+  m_sdlsurface(m_surface->get_surface()),
+  m_texture(NULL),
   update_all_p(false) {
     assert(m_window);
+    assert(m_renderer);
     assert(m_surface);
+    m_texture = SDL_CreateTexture(
+                                m_renderer, m_sdlsurface->format->format, SDL_TEXTUREACCESS_STREAMING,
+                                m_surface->width(), m_surface->height());
+    assert(m_texture);
     assert(m_instance == 0);
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     m_instance = this;
 }
 
 ecl::Screen::~Screen() {
+    SDL_DestroyRenderer(m_renderer);
+    SDL_DestroyTexture(m_texture);
+    delete m_surface;
     m_instance = 0;
 }
 
@@ -360,8 +372,18 @@ void ecl::Screen::update_rect(const Rect &r) {
 }
 
 void ecl::Screen::flush_updates() {
+    SurfaceLock lock(m_surface);
+
+    void* t_pixels;
+    int t_pitch;
     if (update_all_p) {
-        SDL_UpdateWindowSurface(m_window);
+        SDL_Rect scr_size;
+        sdl::copy_rect(scr_size, size());
+        SDL_LockTexture(m_texture, &scr_size, &t_pixels, &t_pitch);
+
+        for(int y = 0; y<height(); y++) memcpy(t_pixels + y*t_pitch, m_surface->scanline_pointer(y), width() * m_surface->bypp());
+
+        SDL_UnlockTexture(m_texture);
         update_all_p = false;
     } else if (!m_dirtyrects.empty()) {
         m_dirtyrects.intersect(size());
@@ -370,9 +392,37 @@ void ecl::Screen::flush_updates() {
         RectList::iterator j = m_dirtyrects.begin();
         for (unsigned i = 0; i < rects.size(); ++i, ++j)
             sdl::copy_rect(rects[i], *j);
-        SDL_UpdateWindowSurfaceRects(m_window, &rects[0], rects.size());
+        
+        for(int i = 0; i<rects.size(); i++){
+            SDL_LockTexture(m_texture, &rects[i], &t_pixels, &t_pitch);
+
+            for(int y = 0; y<rects[i].h; y++) memcpy(t_pixels + y*t_pitch, m_surface->pixel_pointer(rects[i].x, y+rects[i].y), rects[i].w * m_surface->bypp());
+
+            SDL_UnlockTexture(m_texture);
+        }
     }
     m_dirtyrects.clear();
+
+    SDL_RenderCopy(m_renderer, m_texture, NULL, NULL);
+    SDL_RenderPresent(m_renderer);
+}
+
+void ecl::Screen::set_logical_size(int w, int h){
+    SDL_RenderSetLogicalSize(m_renderer, w, h);
+
+    Surface* old_surface = m_surface;
+    m_surface = MakeSurface(w, h);
+    m_sdlsurface = m_surface->get_surface();
+
+    assert(m_surface);
+
+    delete old_surface;
+
+    SDL_DestroyTexture(m_texture);
+
+    m_texture = SDL_CreateTexture(m_renderer, m_sdlsurface->format->format, SDL_TEXTUREACCESS_STREAMING, w, h);
+
+    assert(m_texture);
 }
 
 Rect ecl::Screen::size() const {

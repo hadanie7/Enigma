@@ -328,13 +328,12 @@ private:
 
     ecl::Screen *screen;
     SDL_Window *window;
-    SDL_Renderer *renderer;
     std::unique_ptr<Surface> back_buffer;
     std::unique_ptr<MouseCursor> cursor;
     std::string window_caption;
 };
 
-VideoEngineImpl::VideoEngineImpl() : screen(NULL), window(NULL), renderer(NULL) {
+VideoEngineImpl::VideoEngineImpl() : screen(NULL), window(NULL) {
 }
 
 VideoEngineImpl::~VideoEngineImpl() {
@@ -466,13 +465,9 @@ bool VideoEngineImpl::OpenWindow(int width, int height, bool fullscreen) {
         return false;
     screen = new Screen(window);
 
-    renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
-    if (!renderer)
-        return false;
-
     VideoMode video_mode = FindClosestVideoMode({width, height});
     const VMInfo *vminfo = GetInfo(video_mode);
-    SDL_RenderSetLogicalSize(renderer, vminfo->width, vminfo->height);
+    screen->set_logical_size(vminfo->width, vminfo->height);
 
     cursor.reset(new MouseCursor(screen));
     int x, y;
@@ -498,13 +493,11 @@ VideoMode VideoEngineImpl::FindClosestVideoMode(const DisplayMode &display_mode)
 
 void VideoEngineImpl::CloseWindow() {
     assert(window);
-    assert(renderer);
 
     SetInputGrab(false);
     cursor = nullptr;
     back_buffer = nullptr;
     delete screen;
-    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 }
 
