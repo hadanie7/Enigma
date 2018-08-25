@@ -531,7 +531,17 @@ namespace enigma { namespace gui {
         bool isFullScreen = app.prefs->getBool("FullScreen");
         if (app.selectedDisplayMode != video_engine->ActiveDisplayMode() ||
             isFullScreen != video_engine->IsFullscreen()) {
+
+            enigma::WorldPrepareLevel();
+            enigma::ClearFontCache();
+
             video_engine->SetDisplayMode(app.selectedDisplayMode, isFullScreen);
+
+            LevelPreviewCache::instance()->clear();
+            enigma::ClearImageCache();
+
+            display::Shutdown();
+            display::Init();
 
             app.selectedDisplayMode = video_engine->ActiveDisplayMode();
             app.prefs->setProperty("FullScreen", video_engine->IsFullscreen());
