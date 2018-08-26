@@ -346,13 +346,6 @@ void VideoEngineImpl::Init() {
     int w = 1280;
     int h = 960;
     OpenWindow(w, h, isFullScreen);
-
-// Mac icon is set via Makefile
-#ifndef MACOSX
-    if (Surface *icon = enigma::GetImage("enigma_marble")) {
-        SDL_SetWindowIcon(window, icon->get_surface());
-    }
-#endif
 }
 
 void VideoEngineImpl::Shutdown() {
@@ -473,6 +466,14 @@ bool VideoEngineImpl::OpenWindow(int width, int height, bool fullscreen) {
     VideoMode video_mode = FindClosestVideoMode({width, height});
     const VMInfo *vminfo = GetInfo(video_mode);
     SDL_RenderSetLogicalSize(renderer, vminfo->width, vminfo->height);
+
+
+// Mac icon is set via Makefile
+#ifndef MACOSX
+    if (Surface *icon = enigma::GetImage("enigma_marble")) {
+        SDL_SetWindowIcon(window, icon->get_surface());
+    }
+#endif
 
     cursor.reset(new MouseCursor(screen));
     int x, y;
