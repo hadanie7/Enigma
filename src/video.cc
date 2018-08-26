@@ -455,7 +455,7 @@ void VideoEngineImpl::ShowMouse() {
 bool VideoEngineImpl::OpenWindow(int width, int height, bool fullscreen) {
     Uint32 flags = SDL_WINDOW_SHOWN;
     if (fullscreen)
-        flags |= SDL_WINDOW_FULLSCREEN;
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     // Try to initialize video mode, return error code on failure
     Log << "Opening window " << width << "x" << height << "\n";
