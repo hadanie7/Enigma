@@ -180,6 +180,10 @@ public:
     void update_rect(const Rect &r);
     void flush_updates();
 
+    /* ---------- Logical Size ---------- */
+
+    void set_logical_size(int w, int h);
+
     /* ---------- Accessors ---------- */
 
     SDL_Window *window() const { return m_window; }
@@ -198,6 +202,8 @@ private:
     static Screen *m_instance;
 
     SDL_Window *m_window;
+    SDL_Renderer* m_renderer;
+    SDL_Texture* m_texture;
     Surface *m_surface;
     SDL_Surface *m_sdlsurface;
     RectList m_dirtyrects;
