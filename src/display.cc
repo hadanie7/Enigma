@@ -541,10 +541,15 @@ void DisplayEngine::update_offset() {
         // Blit overlapping screen area from old to new position
         GC screengc(screen->get_surface());
         Rect blitrect(common.x - oldx, common.y - oldy, common.w, common.h);
-        blit(screengc, common.x - newx, common.y - newy, screen->get_surface(), blitrect);
+
+        Surface* temp = Grab(screen->get_surface(), blitrect); // to avoid bliting from a surface to itself (which can be dangerous)
+
+        blit(screengc, common.x - newx, common.y - newy, temp);
         blitrect.x = common.x - newx;
         blitrect.y = common.y - newy;
         screen->update_rect(blitrect);
+
+        delete temp;
 
         // Update offset
         set_offset(V2(newx / double(m_tilew), newy / double(m_tileh)));
